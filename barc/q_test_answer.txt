@@ -1,0 +1,201 @@
+tHere are 8 Q problems of varying difficulty.
+
+We aren't concerned that you solve all of them.  We want to get an idea of how
+you think and how you go about analyzing problems with the Q knowledge that you have.
+
+If a full solution can't be reached on any, described steps working in the direction of a solution would be nice to see.
+
+*************************************
+1. Explain following q output
+q)2 &':/ 3 1 4 5 2 0N 7 6 8
+3 1 1 1 2 0N 0N 0N 6
+
+
+
+*************************************
+2. For a given table (sorted on date)
+date         val
+----------------
+2014.09.01   10
+2014.09.02   15
+2014.09.03   40
+2014.09.04   5
+2014.09.05   1
+2014.09.06   90
+
+Add a (boolean) column which is TRUE if "val" is the maximum value within the corresponding or older date,
+The resulting table should look like this:
+date        val iscurrentmax
+-------------------------
+2014.09.01  10  1
+2014.09.02  15  1
+2014.09.03  40  1
+2014.09.04  5   0
+2014.09.05  1   0
+2014.09.06  90  1
+
+ANSWER
+Given table is named t
+
+date         val
+---------	-------
+t:([] date:(2014.09.01 2014.09.02 2014.09.03 2014.09.04 2014.09.05 2014.09.06); val:(10 15 40 5 1 90))
+
+update iscurrentmax:val>=maxs val from t
+
+
+***********************************
+3. Exists?
+
+Write a function 'exists' which takes a variable symbol v and returns 1b if v is
+defined and 0b if it is not:
+
+	a:10
+	exists`a
+     1b
+	exists`b
+     0b
+	exists`.q
+	 1b
+
+ANSWER:
+
+exists:{not ()~key x}
+
+***********************************
+4. Depends on me
+
+In q we define a view or "dependency" with '::', e.g.:
+
+	a:10
+	b::a+1
+	c::a+2
+	d:c+20
+	e::b+d
+	f::e+4
+	g::f+5
+
+In this example, if a is reassigned, then b, c, e, f and g are invalidated.  Referencing
+an invalid variable causes its definition to recompute and return a new value.
+
+In general if any variable is invalidated, then all of its descendents are invalidated.
+
+The primitive .z.b takes one or more symbols s and for each symbol k in s returns a
+vector of symbols of variables which *directly* depend on k:
+
+	.z.b`a`d
+      `b`c
+      ,`e
+
+Write a function 'dependson' which takes a single symbol v and returns a list of ALL
+the variables which are invalidated by assignment to v, e.g.:
+
+	dependson`a
+      `a`b`c`e`f`g
+
+* Extra points for avoiding explicit recursion in your solution *
+
+
+
+*********************************************
+5. Given a list of expressions
+
+  	d:c+b
+  	c:-b
+  	e:d*a
+  	b:10
+  	a:20
+
+We want to reorder them so that each variable is computed before it is used:
+
+	b:10
+  	c:-b
+  	a:20
+  	d:c+b
+  	e:d*a
+
+Represent the expression list as an appropriate dictionary s. Example:
+
+  s:`d`c`e`b`a!(`c`b;`b;`d`a;0#`;0#`)
+
+There is a function that computes the reordering, e.g.:
+
+  reorder s
+  `b`c`d`a`e
+
+Write 'reorder'.
+
+* Extra points for avoiding explicit recursion in your solution *
+
+
+
+*********************************************
+6. Type map
+Write a function to create a dictionary that maps the type character to the null
+and the uppercase type character to the correctly typed empty list.
+
+ie-
+i| 0Ni
+I| `int$()
+
+The dictionary should have 36 entries
+
+raze {(x;upper x)!(1 0)#\:x$()}@/:except[.Q.t;" "]
+
+*********************************************
+7. Graphs
+
+Represent a graph using an appropriate dictionary to show the edges. Example:
+
+	d.a:`b`e
+	d.b:`c`d
+	d.c:`
+	d.d:enlist`e
+	d.e:`f`g
+	d.f:`
+	d.g:enlist`d
+
+represents:
+
+	a -> b -> c
+	|    |
+	|    +--> d <-+
+    |   v         |   |
+	e <-------+   |
+       / \            |
+      v   v           |
+      f   g ----------+
+
+Write function 'loop' which detects the existence of cycles (loops) in a graph like the one above.
+
+Example return options:
+
+	loop d
+      ,`e
+	loop d
+      `d`e`g
+
+because e -> g -> d -> e.
+
+(it's arbitrary which one of the nodes in the loop your function returns. The full list of the loop is ok too )
+
+* Extra points for avoiding explicit recursion in your solution *
+
+
+
+*********************
+8. Functional select
+
+Given the below table write a function f to select any column or combination of columns by any other column or combination
+
+t:([]time:12:00:00.000+1000*til 27;sym:27#3#`$'.Q.A;col1:sum each(-1 0.5 -1.5 -0.5 2 -2 0 -0.25 1)cross 10 20 30;col2:27#100 200);
+
+Example:
+
+f[`time`col2;`sym`col1;t]
+
+will select time and col2 by sym and col1 from t
+
+
+ANSWER
+f:{[ocols;gcols;tbl] gcols,:();ocols,:(); ?[tbl;();gcols!gcols;ocols!ocols] }
