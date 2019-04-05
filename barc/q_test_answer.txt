@@ -7,8 +7,8 @@ If a full solution can't be reached on any, described steps working in the direc
 
 *************************************
 1. Explain following q output
-q)2 &':/ 3 1 4 5 2 0N 7 6 8
-3 1 1 1 2 0N 0N 0N 6
+q)2 &':/ 3 1 4 5 2 0N 7  6  8
+         3 1 1 1 2 0N 0N 0N 6
 
 
 
@@ -67,13 +67,21 @@ exists:{not ()~key x}
 
 In q we define a view or "dependency" with '::', e.g.:
 
-	a:10
-	b::a+1
-	c::a+2
-	d:c+20
-	e::b+d
-	f::e+4
-	g::f+5
+	a:10;
+	b::a+1;
+	c::a+2;
+	d::c+20;
+	e::b+d;
+	f::e+4;
+	g::f+5;
+
+	a
+	b>a
+	c>a
+	d>c
+	e>b,d
+	f>e
+	g>f
 
 In this example, if a is reassigned, then b, c, e, f and g are invalidated.  Referencing
 an invalid variable causes its definition to recompute and return a new value.
@@ -95,7 +103,7 @@ the variables which are invalidated by assignment to v, e.g.:
 
 * Extra points for avoiding explicit recursion in your solution *
 
-
+dependson:{distinct raze/[{.z.b x}\x};
 
 *********************************************
 5. Given a list of expressions
@@ -127,7 +135,7 @@ Write 'reorder'.
 
 * Extra points for avoiding explicit recursion in your solution *
 
-
+reorder
 
 *********************************************
 6. Type map
