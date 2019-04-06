@@ -75,14 +75,6 @@ In q we define a view or "dependency" with '::', e.g.:
 	f::e+4;
 	g::f+5;
 
-	a
-	b>a
-	c>a
-	d>c
-	e>b,d
-	f>e
-	g>f
-
 In this example, if a is reassigned, then b, c, e, f and g are invalidated.  Referencing
 an invalid variable causes its definition to recompute and return a new value.
 
@@ -103,7 +95,7 @@ the variables which are invalidated by assignment to v, e.g.:
 
 * Extra points for avoiding explicit recursion in your solution *
 
-dependson:{distinct raze/[{.z.b x}\x};
+dependson:{distinct raze/[({.z.b x})\[x,()]]};
 
 *********************************************
 5. Given a list of expressions
@@ -135,7 +127,10 @@ Write 'reorder'.
 
 * Extra points for avoiding explicit recursion in your solution *
 
-reorder
+ANSWER
+
+
+reorder:{reverse distinct raze/[{s raze x}\[ key[s] except distinct raze value x ]]};
 
 *********************************************
 6. Type map
@@ -165,14 +160,14 @@ Represent a graph using an appropriate dictionary to show the edges. Example:
 
 represents:
 
-	a -> b -> c
-	|    |
-	|    +--> d <-+
-    |   v         |   |
-	e <-------+   |
-       / \            |
-      v   v           |
-      f   g ----------+
+    a -> b -> c
+    |    |
+    |    +--> d <-+
+|   v         |   |
+    e <-------+   |
+   / \            |
+  v   v           |
+  f   g ----------+
 
 Write function 'loop' which detects the existence of cycles (loops) in a graph like the one above.
 
@@ -189,7 +184,9 @@ because e -> g -> d -> e.
 
 * Extra points for avoiding explicit recursion in your solution *
 
+ANSWER
 
+loop:{ r:raze d x;r ((where not (`~'d r) ))}
 
 *********************
 8. Functional select
